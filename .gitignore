@@ -1,0 +1,9 @@
+.DS_Store
+node_modules/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/articles-cleaned/
+/convex-backend-clone/
+/tmp
+.env

@@ -1,0 +1,34 @@
+{
+  "name": "scrap-convex-blog",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "get-articles-link": "node src/blog/get-articles-link.js",
+    "scrape-articles": "node src/blog/scrape-articles.js",
+    "clean-articles": "node src/blog/clean-articles.js",
+    "combine-articles": "node src/blog/combine-articles.js",
+    "scrape-convex-blog": "npm run get-articles-link && npm run scrape-articles && npm run clean-articles && npm run combine-articles",
+    "scrape-convex-docs": "node src/doc/scrape-convex-docs.js",
+    "fetch-convex-helpers": "node src/helpers/fetch-convex-helpers.js",
+    "combine-all": "node src/merge-convex-knowledge.js",
+    "build": "npm run scrape-convex-blog && npm run scrape-convex-docs && npm run fetch-convex-helpers && npm run combine-all",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.5.0",
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "@types/node": "^22.15.21",
+    "prettier": "^3.5.3"
+  },
+  "dependencies": {
+    "@mendable/firecrawl-js": "^1.25.1",
+    "dotenv": "^16.5.0",
+    "playwright": "^1.52.0"
+  }
+}
