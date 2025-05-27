@@ -2,45 +2,52 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Architecture Overview
-
-This is a web scraping project focused on collecting and processing Convex development pattern articles from stack.convex.dev. The codebase follows a three-stage pipeline:
-
-1. **Pattern Discovery** (`src/blog/get-articles-link.js`) - Uses Playwright to discover article URLs from the Convex patterns page
-2. **Content Scraping** (`src/blog/scrape-articles.js`) - Uses FireCrawl API to extract markdown content from discovered URLs
-3. **Content Cleaning** (`src/blog/clean-articles.js`) - Post-processes scraped articles to remove navigation elements and line numbers
-
-The workflow stores URLs in `tmp/blog/article-links.json`, raw articles in `dist/blog/articles/`, and cleaned versions in `tmp/blog/cleaned/`.
-
 ## Common Commands
 
-```bash
-# Install dependencies
-pnpm install
+### Data Collection Pipeline
+- `npm run build` - Full pipeline: scrapes blog, docs, helpers, then combines all
+- `npm run scrape-convex-blog` - Complete blog scraping pipeline (get links → scrape → clean → combine)
+- `npm run scrape-convex-docs` - Clone and scrape Convex documentation from GitHub
+- `npm run fetch-convex-helpers` - Fetch convex-helpers README from GitHub
+- `npm run combine-all` - Merge all scraped content into final knowledge base
 
-# Discover and save article URLs from Convex patterns page
-pnpm run get-articles-link
+### Individual Pipeline Steps
+- `npm run get-articles-link` - Extract article URLs from Convex blog
+- `npm run scrape-articles` - Scrape individual articles using FireCrawl
+- `npm run clean-articles` - Clean and process scraped article content
+- `npm run combine-articles` - Combine articles into single blog markdown
 
-# Scrape all articles from saved URLs to markdown files
-pnpm run scrape-articles
+### Code Quality
+- `npm run format` - Format code with Prettier
+- `npm run format:check` - Check code formatting
 
-# Clean scraped articles (remove headers, line numbers, hero images)
-pnpm run clean-articles
-```
+## Architecture Overview
 
-## Key Implementation Details
+This is a web scraping and content aggregation tool that builds a comprehensive Convex knowledge base by collecting content from three sources:
 
-- **ES Modules**: All files use ES module syntax (`import`/`export`)
-- **FireCrawl Integration**: Uses FireCrawl API for robust article extraction with API key in `src/blog/scrape-articles.js:9`
-- **Rate Limiting**: Built-in 1-second delays between scraping requests to avoid API limits
-- **Incremental Processing**: Scripts skip existing files to allow resuming interrupted operations
-- **Content Sanitization**: Removes code block line numbers and duplicate titles while preserving article structure
+### Data Sources
+1. **Blog Articles** (`src/blog/`) - Scrapes the Convex blog using FireCrawl API
+2. **Official Documentation** (`src/doc/`) - Clones convex-backend repo and extracts docs
+3. **Helper Utilities** (`src/helpers/`) - Fetches convex-helpers README from GitHub
 
-## File Processing Logic
+### Pipeline Architecture
+The system follows a multi-stage pipeline:
+1. **Collection**: Each source has its own scraper that outputs to `tmp/` directories
+2. **Processing**: Content is cleaned and formatted into markdown
+3. **Aggregation**: All sources are merged into a single `convex-knowledge.md` file
 
-The cleaning script (`src/blog/clean-articles.js`) implements sophisticated article header detection:
+### Key Files
+- `src/merge-convex-knowledge.js` - Final aggregation step that combines all sources
+- `src/blog/scrape-articles.js` - Uses FireCrawl API to scrape blog articles
+- `src/doc/scrape-convex-docs.js` - Clones GitHub repo and extracts documentation
+- `src/helpers/fetch-convex-helpers.js` - Simple HTTP fetch for helper docs
 
-- Identifies duplicate H1 titles (original + scraped title)
-- Locates hero images that follow the second title
-- Preserves the first title and removes navigation/metadata content
-- Strips line numbers from code blocks while maintaining formatting
+### Environment Requirements
+- `FIRECRAWL_API_KEY` environment variable required for blog scraping
+- Uses pnpm as package manager
+- Outputs to `tmp/` directories during processing, final output is `convex-knowledge.md`
+
+### Content Processing
+- Blog articles are stored individually in `src/blog/articles/` then combined
+- Documentation is extracted from cloned repo and merged into single file
+- All content is ultimately combined with headers and separators in the final knowledge base
